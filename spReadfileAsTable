@@ -5,7 +5,8 @@
 *  Syntax :
 *    DECLARE @file TABLE ( [LineNo] int, line varchar(MAX));
 *    INSERT INTO @file ([LineNo], [line]) EXEC #spReadfileAsTable @Path = 'C:\TEMP', @filename = 'Test.csv'
-*    SELECT [LineNo], [line] FROM @file;*
+*    SELECT [LineNo], [line] FROM @file;
+*
 */
 CREATE OR ALTER PROCEDURE #spReadfileAsTable
 ( @Path VARCHAR(255)    
