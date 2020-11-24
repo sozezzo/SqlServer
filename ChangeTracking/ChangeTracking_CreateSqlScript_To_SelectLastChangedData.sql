@@ -67,8 +67,8 @@ DECLARE @TemporaryTableSqlHasChangedList VARCHAR(MAX) = '' collate DATABASE_DEFA
 IF (@AddInfo_HasChangedColumun = 1)
 BEGIN
 	SELECT @Script_haschanged = @Script_haschanged + ', CHANGE_TRACKING_IS_COLUMN_IN_MASK (COLUMNPROPERTY(OBJECT_ID(''' collate DATABASE_DEFAULT +s.name+'.' collate DATABASE_DEFAULT   +t.name+''' collate DATABASE_DEFAULT ), ''' collate DATABASE_DEFAULT +c.[name]+''', ''ColumnId''), p.sys_change_columns) AS [' collate DATABASE_DEFAULT +c.[name]+'_has_changed]' collate DATABASE_DEFAULT + CHAR(13) + CHAR(10),
-	       @TemporaryTableSqlHasChanged = @TemporaryTableSqlHasChanged + ',['+c.name+'_has_changed] [int] NULL'+CHAR(13)+CHAR(10),
-		   @TemporaryTableSqlHasChangedList = @TemporaryTableSqlHasChangedList + ',['+c.name+'_has_changed]'
+	       @TemporaryTableSqlHasChanged = @TemporaryTableSqlHasChanged + ',[' collate DATABASE_DEFAULT +c.name+'_has_changed] [int] NULL' collate DATABASE_DEFAULT +CHAR(13)+CHAR(10),
+		   @TemporaryTableSqlHasChangedList = @TemporaryTableSqlHasChangedList + ',[' collate DATABASE_DEFAULT +c.name+'_has_changed]' collate DATABASE_DEFAULT 
 	FROM       sys.columns c
 	INNER JOIN sys.tables  t ON c.object_id = t.object_id
 	INNER JOIN sys.schemas s ON t.schema_id = s.schema_id
@@ -102,8 +102,8 @@ DECLARE @tb TABLE (
 	+ CHAR(13) + CHAR(10)
 	FROM sys.tables AS t INNER JOIN sys.schemas AS s ON t.schema_id = s.schema_id INNER JOIN sys.columns AS tc ON t.object_id = tc.object_id INNER JOIN sys.types AS ty 
 	ON tc.user_type_id = ty.user_type_id 
-	WHERE (t.name = 'TableSimpleTest')
-	AND (s.name = 'repl-test')
+	WHERE (t.name = @TableName)
+	AND (s.name = @SchemaName)
 
 	SET @TemporaryTableIni = @TemporaryTableIni + ');
 
@@ -112,12 +112,14 @@ INSERT INTO @tb ([SYS_CHANGE_VERSION], [SYS_CHANGE_CREATION_VERSION], [SYS_CHANG
 	SET @TemporaryTableEnd = '
 SELECT  @LastChangeVersion = MAX([SYS_CHANGE_VERSION]) FROM @tb;
 
-SELECT [SYS_CHANGE_VERSION], [SYS_CHANGE_CREATION_VERSION], [SYS_CHANGE_OPERATION], [SYS_CHANGE_COLUMNS]' +@TemporaryTableSqlHasChangedList+@TemporaryTableList+' FROM @tb;
+SELECT [SYS_CHANGE_VERSION], [SYS_CHANGE_CREATION_VERSION], [SYS_CHANGE_OPERATION], [SYS_CHANGE_COLUMNS]' collate DATABASE_DEFAULT + @TemporaryTableSqlHasChangedList+@TemporaryTableList+' FROM @tb;
 PRINT ''-- Next @LastChangeVersion value : '' + CAST(@LastChangeVersion AS NVARCHAR(50)); 
-';
+' collate DATABASE_DEFAULT ;
 
 END
-
+PRINT '-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --' collate DATABASE_DEFAULT;
+PRINT '-- SQL Script to check Change-Tracking on table [' collate DATABASE_DEFAULT + @SchemaName + '].[' collate DATABASE_DEFAULT + @TableName + ']' collate DATABASE_DEFAULT; 
+PRINT '-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --' collate DATABASE_DEFAULT;
 DECLARE @Template VARCHAR(MAX) = 
 '
 -- Set last change version -- 
