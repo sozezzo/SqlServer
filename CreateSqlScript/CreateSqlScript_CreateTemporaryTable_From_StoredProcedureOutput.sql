@@ -1,6 +1,6 @@
-CREATE OR ALTER PROCEDURE CreateSqlScript_CreateTemporaryTable_From_StoredProcedureOutput
+CREATE OR ALTER PROCEDURE #CreateSqlScript_CreateTemporaryTable_From_StoredProcedureOutput
 (
-	@cmdStoredProcedure nvarchar(max),
+	@cmdStoredProcedure nvarchar(max), 
 	@tempTableName sysname = '#tb'
 )
 AS
@@ -13,7 +13,11 @@ BEGIN
 SET NOCOUNT ON;
 
 /*
-USE tempdb;
+
+-- Example -- Use  case --
+
+
+-- Create a Stored procedure 
 IF OBJECT_ID(N'dbo.outputTest', N'P') IS NOT NULL
 DROP PROCEDURE dbo.outputTest;
 GO
@@ -32,11 +36,16 @@ BEGIN
     FROM (VALUES (@column_i, @column_j, @column_k)) v(i, j, k);
 END
 GO
+---
 
+
+-- Create TABLE statement to create a temporary table FROM Stored Procedure results
+DECLARE @tempTableName NVARCHAR(128);
+DECLARE @cmd NVARCHAR(max);
 SET @tempTableName = N'#someTable';
 SET @cmd = N'EXEC dbo.outputTest @column_i = 1, @column_j = NULL, @column_k = NULL;';
 
-EXEC CreateSqlScript_CreateTemporaryTable_From_StoredProcedureOutput @cmdStoredProcedure = @cmd
+EXEC #CreateSqlScript_CreateTemporaryTable_From_StoredProcedureOutput @cmdStoredProcedure = @cmd
 
 */
 
