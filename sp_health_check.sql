@@ -1,5 +1,4 @@
 GO
-/****** Object:  StoredProcedure [dbo].[sp_health_check]    Script Date: 2020-12-11 9:56:25 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
