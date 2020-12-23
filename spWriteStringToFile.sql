@@ -5,6 +5,8 @@
 *  Syntax :
 *  EXEC #spWriteStringToFile @String = 'Hello Word!', @Path = 'C:\Temp\', @Filename = 'myfile.txt';
 *
+*  Info : OA procs can only be accessed with Sysadmin authority
+*
 */
 CREATE OR ALTER PROCEDURE #spWriteStringToFile
 ( @String VARCHAR(MAX)
@@ -13,7 +15,22 @@ CREATE OR ALTER PROCEDURE #spWriteStringToFile
 )
 AS
 BEGIN
-
+/*
+-- Set configuration to use Ole Automation Procedures
+GO
+exec sp_configure 'show advanced options', 1 
+GO 
+RECONFIGURE; 
+GO 
+exec sp_configure 'Ole Automation Procedures', 1 
+GO 
+RECONFIGURE; 
+GO 
+exec sp_configure 'show advanced options', 1 
+GO 
+RECONFIGURE;
+GO
+*/
 	SET NOCOUNT ON;
 
 	DECLARE @objFileSystem INT , @objTextStream INT , @objErrorObject INT , @strErrorMessage VARCHAR(1000) , @Command VARCHAR(1000) , @hr INT , @fileAndPath VARCHAR(512);
