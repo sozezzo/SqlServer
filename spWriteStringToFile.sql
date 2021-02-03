@@ -1,3 +1,4 @@
+CREATE OR ALTER PROCEDURE #spWriteStringToFile
 /*
 *  Name : #spWriteStringToFile
 *  Description : Write in text file
@@ -32,7 +33,6 @@ RECONFIGURE;
 GO
 */
 	SET NOCOUNT ON;
-BEGIN 
 
 	DECLARE @OLE            INT 
 
