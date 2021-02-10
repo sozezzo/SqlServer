@@ -29,11 +29,11 @@ DECLARE @Script_PrimaryKey VARCHAR(MAX) = '';
 DECLARE @Script_WherePrimaryKey VARCHAR(MAX) = '';
 SELECT @Script_PrimaryKey = @Script_PrimaryKey + ', p.['+c.[name]+']',
 @Script_WherePrimaryKey = IIF(@Script_WherePrimaryKey = '', '', ' AND ') + 't.['+c.[name]+'] = p.['+c.[name]+']'
-FROM sys.tables AS t INNER JOIN
-    sys.schemas AS s ON t.schema_id = s.schema_id INNER JOIN
-    sys.indexes AS i ON i.object_id = t.object_id INNER JOIN
-    sys.index_columns AS ic ON ic.object_id = t.object_id INNER JOIN
-    sys.columns AS c ON c.object_id = t.object_id AND ic.column_id = c.column_id
+FROM  sys.tables AS t INNER JOIN
+      sys.schemas AS s ON t.schema_id = s.schema_id INNER JOIN
+      sys.indexes AS i ON i.object_id = t.object_id INNER JOIN
+      sys.index_columns AS ic ON ic.object_id = t.object_id AND i.index_id = ic.index_id INNER JOIN
+      sys.columns AS c ON c.object_id = t.object_id AND ic.column_id = c.column_id
 WHERE t.name = @TableName
 	AND s.name = @SchemaName
 	AND i.is_primary_key = 1;
