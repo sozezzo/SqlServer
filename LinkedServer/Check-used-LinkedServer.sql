@@ -1,16 +1,21 @@
 --
 -- https://dba.stackexchange.com/questions/127613/how-can-i-tell-what-database-procedure-is-using-a-linked-server
 --
+GO
+DROP TABLE IF EXISTS #SearchResults;
+DROP TABLE IF EXISTS #ObjectsToSearchFor;
+GO
 /*********************************
     Name: Text Searcher
     Author: Jonathan Fite
     Created: 1/16/2015
+	Update : 2021-08-12 ADD "Linked Server status" 
 
     Purpose: To enable one to more easily search for objects by an indicated string.
 
     Usage: 
         - Update the "Where To Search" section to turn on or off various sections.
-        - Craft an insert statement to populate "@ObjectsToSearchFor" with the text you
+        - Craft an insert statement to populate "#ObjectsToSearchFor" with the text you
             want to look for.  
         - Execute.
 
@@ -24,12 +29,13 @@
 
     CAUTION: If you want to use the recursive functionality, you will need to save off the results FIRST.  
 
-        DROP TABLE IF EXISTS #SearchResults
+        DROP TABLE IF EXISTS #SearchResults;
+		DROP TABLE IF EXISTS #ObjectsToSearchFor;
 
     -Linked Server Query (finds all references to linked servers as configured, as well as all variations
         that would allow for accessing a remote server without using a linked server.
 
-        INSERT INTO @ObjectsToSearchFor
+        INSERT INTO #ObjectsToSearchFor
         (TextString)
         SELECT srvname FROM sys.sysservers WHERE srvname <> @@SERVERNAME 
         UNION
@@ -56,22 +62,20 @@ DECLARE @SearchObjectDefinition BIT = 1
 DECLARE @SearchAgentJobs BIT = 1
 
 /** What are you looking for? **/
-DECLARE @ObjectsToSearchFor TABLE
-    (
-    TextString VARCHAR(200) NULL
-    )
+DROP TABLE IF EXISTS #ObjectsToSearchFor;
+CREATE TABLE #ObjectsToSearchFor ( TextString VARCHAR(200) NULL, [LinkedServerStatus] varchar(50) )
 
-INSERT INTO @ObjectsToSearchFor
-(TextString)
-SELECT srvname FROM sys.sysservers WHERE srvname <> @@SERVERNAME 
+INSERT INTO #ObjectsToSearchFor
+( TextString )
+SELECT srvname         FROM sys.sysservers WHERE srvname    <> @@SERVERNAME 
 UNION
-SELECT datasource FROM sys.sysservers WHERE srvname <> @@SERVERNAME
+SELECT datasource      FROM sys.sysservers WHERE srvname    <> @@SERVERNAME
 UNION
-SELECT srvnetname FROM sys.sysservers WHERE srvnetname <> @@SERVERNAME
+SELECT srvnetname      FROM sys.sysservers WHERE srvnetname <> @@SERVERNAME
 UNION
-SELECT 'OPENROWSET'
+SELECT 'OPENROWSET'    
 UNION
-SELECT 'OPENQUERY'
+SELECT 'OPENQUERY'     
 UNION 
 SELECT 'OPENDATASOURCE'
 
@@ -87,12 +91,11 @@ SELECT 'OPENDATASOURCE'
 IF OBJECT_ID('tempdb..#SearchResults') IS NOT NULL
 BEGIN
 
-    DELETE FROM @ObjectsToSearchFor 
+    DELETE FROM #ObjectsToSearchFor 
 
     --This allows for successive iterations to search for objects which reference objects which reference....
-    INSERT INTO @ObjectsToSearchFor
-    (TextString)
-    SELECT DISTINCT ObjectName
+    INSERT INTO #ObjectsToSearchFor (TextString, LinkedServerStatus)
+    SELECT DISTINCT ObjectName, NULL
     FROM #SearchResults 
     WHERE LocationFound IN ('sys.sql_modules')
         AND ObjectName IS NOT NULL 
@@ -120,7 +123,7 @@ DECLARE @Query NVARCHAR(4000)
 -- Loop through search terms.
 DECLARE curSearch CURSOR LOCAL STATIC FORWARD_ONLY
 FOR SELECT O.TextString
-    FROM @ObjectsToSearchFor O
+    FROM #ObjectsToSearchFor O
 
 OPEN curSearch
 
@@ -301,15 +304,37 @@ END
 CLOSE curSearch
 DEALLOCATE curSearch 
 
+/***************** Check Linked Server Status ********************/
+DECLARE @sysservername sysname;
+WHILE ( (SELECT COUNT(*) FROM #ObjectsToSearchFor WHERE [LinkedServerStatus] IS NULL) > 0 )
+BEGIN
+	
+	SELECT TOP 1 @sysservername = CONVERT(sysname, TextString) FROM #ObjectsToSearchFor WHERE [LinkedServerStatus] IS NULL;
+	UPDATE #ObjectsToSearchFor SET [LinkedServerStatus] = ''   WHERE TextString = @sysservername;
+	IF ((SELECT COUNT(*) FROM sys.sysservers WHERE @sysservername = srvname) = 0 ) CONTINUE;
+
+	PRINT 'Check linked server status : ' + @sysservername;
+
+	BEGIN TRY
+		EXEC sys.sp_testlinkedserver @sysservername;
+		UPDATE #ObjectsToSearchFor SET [LinkedServerStatus] = 'OK'   WHERE TextString = @sysservername;
+	END TRY
+	BEGIN CATCH
+		UPDATE #ObjectsToSearchFor SET [LinkedServerStatus] = 'FAIL' WHERE TextString = @sysservername;
+	END CATCH;
+
+END
 
 /***************** Display Output **********************************/
 
 --Display search terms.
-SELECT O.TextString
+SELECT 
+      O.TextString
+	, [LinkedServerStatus]
     , COUNT(S.MatchedOn) AS MatchCount 
-FROM @ObjectsToSearchFor O
+FROM #ObjectsToSearchFor O
     LEFT OUTER JOIN #SearchResults S ON S.MatchedOn = O.TextString
-GROUP BY O.TextString 
+GROUP BY O.TextString, O.[LinkedServerStatus]
 
 --Display search results.
 SELECT DISTINCT * FROM #SearchResults 
