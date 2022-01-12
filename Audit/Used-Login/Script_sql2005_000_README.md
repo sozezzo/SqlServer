@@ -8,7 +8,16 @@ Who access? What database? From where? With what application? ... each day ...
 
 ``` sql
 
-SELECT  UsedLoginId, MonitorLocalDate, LoginName, HostName, DatabaseName, ProgramName, LastBatch FROM msdb.Monitor.UsedLogin
+SELECT  UsedLoginId, MonitorLocalDate, LoginName, HostName
+        DatabaseName, ProgramName, LastBatch 
+FROM msdb.Monitor.UsedLogin
+
+```
+
+``` sql
+
+SELECT  DISTINCT LoginName, HostName, DatabaseName 
+FROM msdb.Monitor.UsedLogin
 
 ```
 
