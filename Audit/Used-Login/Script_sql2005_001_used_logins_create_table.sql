@@ -6,7 +6,6 @@ SET QUOTED_IDENTIFIER ON
 Go
 CREATE SCHEMA [Monitor];
 GO
-DROP TABLE [Monitor].[UsedLogin];
 GO
 CREATE TABLE [Monitor].[UsedLogin](
 	[UsedLoginId] [int] IDENTITY(1,1) NOT NULL,

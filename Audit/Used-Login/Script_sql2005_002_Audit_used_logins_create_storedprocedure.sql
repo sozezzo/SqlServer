@@ -1,21 +1,20 @@
 use msdb
 GO
-DROP PROCEDURE [Monitor].[uspUsedLogin];
-GO
+
 /*
  * Description: Log used logins
  */
-CREATE PROCEDURE [Monitor].[uspUsedLogin]
+CREATE PROCEDURE [Monitor].[usp_Monitoring_UsedLogin]
 AS
 BEGIN
 
 	SET nocount ON
 
 	SELECT convert(INT , convert(varchar, getdate(), 112)) AS [MonitorLocalDate]
-	,      CAST(ISNULL(CONVERT(sysname, rtrim(loginame)),'') AS [nvarchar](128)) AS [LoginName]
-	,      CAST(HostName as [nvarchar](256)) AS HostName
+	,      RTRIM(CAST(ISNULL(CONVERT(sysname, rtrim(loginame)),'') AS [nvarchar](128))) AS [LoginName]
+	,      RTRIM(CAST(HostName as [nvarchar](256))) AS HostName
 	,      CASE WHEN dbid=0 THEN '' ELSE db_name(dbid) END AS [DatabaseName]
-	,      CAST(program_name AS [nvarchar](128)) AS ProgramName
+	,      RTRIM(CAST(program_name AS [nvarchar](128))) AS ProgramName
 	,      MAX(last_batch) AS LastBatch
 	INTO #sysprocesses
 	FROM sys.sysprocesses WITH (nolock)
@@ -48,3 +47,5 @@ BEGIN
 END
 GO
 ---
+
+

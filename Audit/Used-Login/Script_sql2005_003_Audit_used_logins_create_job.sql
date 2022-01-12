@@ -33,7 +33,7 @@ EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Used log
 		@retry_attempts=0, 
 		@retry_interval=0, 
 		@os_run_priority=0, @subsystem=N'TSQL', 
-		@command=N'exec [Monitor].[uspUsedLogin];', 
+		@command=N'exec [Monitor].[usp_Monitoring_UsedLogin];', 
 		@database_name=N'msdb', 
 		@flags=0
 IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
@@ -47,7 +47,7 @@ EXEC @ReturnCode = msdb.dbo.sp_add_jobschedule @job_id=@jobId, @name=N'each 5 mi
 		@freq_subday_interval=5, 
 		@freq_relative_interval=0, 
 		@freq_recurrence_factor=0, 
-		@active_start_date=20220111, 
+		@active_start_date=20050101, 
 		@active_end_date=99991231, 
 		@active_start_time=0, 
 		@active_end_time=235959
