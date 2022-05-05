@@ -1,4 +1,4 @@
-USE [msdb]
+USE [master]
 GO
 SET ANSI_NULLS ON
 GO
