@@ -54,7 +54,12 @@ exec #AuditProcedureCode 'dbo', 'sp_test'
 
 ```
 
+![image](https://github.com/user-attachments/assets/ddaa393f-3c9f-4220-ba52-16dc3e3a8cd1)
 
+And copy the code into our stored procedure.
+
+
+This is the temporary stored procedure to create the code:
 
 ``` sql
 create procedure #AuditProcedureCode 
