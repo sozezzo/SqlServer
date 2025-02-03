@@ -13,7 +13,7 @@ end
 ```
 
 
-For this example, you need to add this code to logger the call of stroed procedure.
+For this example, we need to add this code to log the call of the stored procedure.
 ``` sql
  -- -- -- -- -- -- -- -- -- 
 	--#region Audit Used Stored Procedure
@@ -45,7 +45,7 @@ begin
 end
 ```
 
-If we have just 1 or 2 stored procedure, It's ease to modifify and adapt to the stored procedure we want to logger, but if we have many stored procedures, maybe, we can create the code using the temporary procedure #AuditProcedureCode.
+If we have just one or two stored procedures, it's easy to modify and adapt them to the stored procedure we want to log. But if we have many stored procedures, maybe we can create the code using the temporary procedure #AuditProcedureCode.
 
 We just need the schema and procedure name.
 
@@ -99,3 +99,5 @@ begin
 end
 go
 ```
+
+Don't forget to create a job or procedure to clean the data.
