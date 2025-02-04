@@ -11,7 +11,7 @@ CREATE TABLE [dbo].[AuditProcedureMetadata](
 	[application_name] [varchar](128) NOT NULL,
 	[schema_name] [varchar](100) NOT NULL,
 	[object_name] [varchar](128) NOT NULL,
-	[created_name] [datetime] NULL,
+	[created_date] [datetime] NULL,
  CONSTRAINT [PK__AuditPro__1D1DCD0D7AD3CAFD] PRIMARY KEY CLUSTERED 
 (
 	[AuditProcedureMetadata_id] ASC
@@ -27,6 +27,6 @@ CREATE TABLE [dbo].[AuditProcedureMetadata](
 ) ON [PRIMARY]
 GO
 
-ALTER TABLE [dbo].[AuditProcedureMetadata] ADD  CONSTRAINT [DF_AuditProcedureMetadata_created_name]  DEFAULT (getutcdate()) FOR [created_name]
+ALTER TABLE [dbo].[AuditProcedureMetadata] ADD  CONSTRAINT [DF_AuditProcedureMetadata_created_date]  DEFAULT (getutcdate()) FOR [created_date]
 GO
 
