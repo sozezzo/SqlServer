@@ -47,10 +47,8 @@ GO
 
 	--Commit data and close text stream
 	EXECUTE sp_OAMethod                  @OLE,    'SaveToFile',       NULL,       @File, 2   --1 = notexist 2 = overwrite
-	EXECUTE sp_OAMethod                  @OLE,    'Close'
-	EXECUTE sp_OADestroy                 @OLE
-
-	EXECUTE sp_OADestroy @OLE 
+        EXECUTE sp_OAMethod                  @OLE,    'Close'
+        EXECUTE sp_OADestroy                 @OLE
 
 END 
 GO
